@@ -1,8 +1,8 @@
-CREATE SCHEMA p1_database;
-CREATE SCHEMA p2_database;
-CREATE SCHEMA p3_database;
+CREATE SCHEMA dish_management;
+CREATE SCHEMA review_and_rating;
+CREATE SCHEMA image_management;
 
-USE p1_database;
+USE dish_management;
 
 CREATE TABLE dishes (
                         id CHAR(36) PRIMARY KEY,
@@ -17,7 +17,7 @@ CREATE TABLE dishes (
 
 CREATE INDEX idx_name ON dishes(name);
 
-USE p2_database;
+USE review_and_rating;
 
 CREATE TABLE reviews (
                          id CHAR(36) PRIMARY KEY,
@@ -27,13 +27,13 @@ CREATE TABLE reviews (
                          review TEXT,
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         FOREIGN KEY (dish_id) REFERENCES p1_database.dishes(id) ON DELETE CASCADE  -- Reference to the `dishes` table in the dish_management_db database
+                         FOREIGN KEY (dish_id) REFERENCES dish_management.dishes(id) ON DELETE CASCADE  -- Reference to the `dishes` table in the dish_management_db database
 );
 
 CREATE INDEX idx_dish_id ON reviews(dish_id);
 CREATE INDEX idx_user_id ON reviews(user_id);
 
-USE p3_database;
+USE image_management;
 
 CREATE TABLE images (
                         id CHAR(36) PRIMARY KEY,
@@ -42,8 +42,8 @@ CREATE TABLE images (
                         url VARCHAR(512) NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (dish_id) REFERENCES p1_database.dishes(id) ON DELETE SET NULL,  -- Reference to the `dishes` table in the dish_management_db
-                        FOREIGN KEY (review_id) REFERENCES p2_database.reviews(id) ON DELETE SET NULL  -- Reference to the `reviews` table in the review_db
+                        FOREIGN KEY (dish_id) REFERENCES dish_management.dishes(id) ON DELETE SET NULL,  -- Reference to the `dishes` table in the dish_management_db
+                        FOREIGN KEY (review_id) REFERENCES review_and_rating.reviews(id) ON DELETE SET NULL  -- Reference to the `reviews` table in the review_db
 );
 
 CREATE INDEX idx_dish_id ON images(dish_id);
