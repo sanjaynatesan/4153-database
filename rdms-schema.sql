@@ -4,15 +4,28 @@ CREATE SCHEMA image_management;
 
 USE dish_management;
 
+CREATE TABLE dining_halls (
+                              id INT PRIMARY KEY AUTO_INCREMENT,
+                              name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE stations (
+                          id INT PRIMARY KEY AUTO_INCREMENT,
+                          name VARCHAR(255) NOT NULL,
+                          dining_hall_id INT NOT NULL,
+                          FOREIGN KEY (dining_hall_id) REFERENCES dining_halls(id) ON DELETE CASCADE
+);
+
 CREATE TABLE dishes (
-                        id CHAR(36) PRIMARY KEY,
+                        id INT PRIMARY KEY AUTO_INCREMENT,
                         name VARCHAR(255) NOT NULL,
                         description TEXT,
-                        category VARCHAR(100),
-                        location VARCHAR(255),
+                        dining_hall_id INT NOT NULL,
+                        station_id INT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        dietary_info JSON
+                        FOREIGN KEY (dining_hall_id) REFERENCES dining_halls(id) ON DELETE CASCADE,
+                        FOREIGN KEY (station_id) REFERENCES stations(id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_name ON dishes(name);
@@ -20,30 +33,28 @@ CREATE INDEX idx_name ON dishes(name);
 USE review_and_rating;
 
 CREATE TABLE reviews (
-                         id CHAR(36) PRIMARY KEY,
-                         dish_id CHAR(36) NOT NULL,
-                         user_id CHAR(36),
+                         id INT PRIMARY KEY AUTO_INCREMENT,
+                         dish_id INT NOT NULL,
                          rating INT CHECK (rating >= 1 AND rating <= 5),
                          review TEXT,
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         FOREIGN KEY (dish_id) REFERENCES dish_management.dishes(id) ON DELETE CASCADE  -- Reference to the `dishes` table in the dish_management_db database
+                         FOREIGN KEY (dish_id) REFERENCES dish_management.dishes(id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_dish_id ON reviews(dish_id);
-CREATE INDEX idx_user_id ON reviews(user_id);
 
 USE image_management;
 
 CREATE TABLE images (
-                        id CHAR(36) PRIMARY KEY,
-                        dish_id CHAR(36),
-                        review_id CHAR(36),
+                        id INT PRIMARY KEY AUTO_INCREMENT,
+                        dish_id INT,
+                        review_id INT,
                         url VARCHAR(512) NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (dish_id) REFERENCES dish_management.dishes(id) ON DELETE SET NULL,  -- Reference to the `dishes` table in the dish_management_db
-                        FOREIGN KEY (review_id) REFERENCES review_and_rating.reviews(id) ON DELETE SET NULL  -- Reference to the `reviews` table in the review_db
+                        FOREIGN KEY (dish_id) REFERENCES dish_management.dishes(id) ON DELETE SET NULL,
+                        FOREIGN KEY (review_id) REFERENCES review_and_rating.reviews(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_dish_id ON images(dish_id);
